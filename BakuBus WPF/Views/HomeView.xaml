@@ -1,0 +1,68 @@
+﻿<Window x:Class="BakuBus_WPF.Views.HomeView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BakuBus_WPF.Views" xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+        mc:Ignorable="d"
+        Title="HomeView" Height="450" Width="800">
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.Resources>
+            <ControlTemplate x:Key="myPushpin" TargetType="m:Pushpin">
+                <m:Pushpin Background="Red" Content="{TemplateBinding Content}">
+
+                </m:Pushpin>
+            </ControlTemplate>
+        </Grid.Resources>
+
+        <m:Map x:Name="myMap" Mode="AerialWithLabels" CredentialsProvider="{Binding MapKey}"  Center="40.409264 ,49.867092 " ZoomLevel="11" Grid.ColumnSpan="2">
+            <m:MapItemsControl Name="mapList" ItemsSource="{Binding BakuBus.Buses}">
+                <m:MapItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <m:Pushpin Template="{StaticResource myPushpin}" Content="{Binding Attributes.DISPLAY_ROUTE_CODE}" Location="{Binding Attributes.LOCATION}" Visibility="{Binding Attributes.VISIBILITY}">
+                            <m:Pushpin.ToolTip>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="2*"/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="14" Text="{Binding Attributes.BUS_ID}"/>
+
+
+                                    <Image Grid.Row="1" Grid.ColumnSpan="2" Source="/Bus.png"></Image>
+
+                                    <TextBlock Grid.Row="2" HorizontalAlignment="Center" Margin="0 0 3 0" FontSize="14" Text="Previous: "/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Margin="3 0 0 0" FontSize="14" Text="{Binding Attributes.PREV_STOP}"/>
+                                    <TextBlock Grid.Row="3" HorizontalAlignment="Center" FontSize="14" Text="Current: "/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" FontSize="14" Text="{Binding Attributes.CURRENT_STOP}"/>
+                                </Grid>
+
+
+
+                            </m:Pushpin.ToolTip>
+                        </m:Pushpin>
+                    </DataTemplate>
+                </m:MapItemsControl.ItemTemplate>
+            </m:MapItemsControl>
+        </m:Map>
+        <ComboBox ItemsSource="{Binding ComboBoxBuses}" SelectedItem="{Binding MySelectedItem}"  VerticalAlignment="Top" Margin=" 5 20 5 10"/>
+        <!--<mycontrols:MyComboBox Command="{Binding BusSelectCommand}" CommandParameter="{Binding ElementName=mapList}" CommandTarget="{Binding ElementName=mapList}" SelectedIndex="{Binding CurrentIndex,UpdateSourceTrigger=PropertyChanged}"  
+                               VerticalAlignment="Top" Margin=" 5 20 5 10" ItemsSource="{Binding ComboBoxBuses}"/>-->
+
+    </Grid>
+</Window>
