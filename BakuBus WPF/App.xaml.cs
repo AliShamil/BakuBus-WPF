@@ -15,7 +15,7 @@ public partial class App : Application
 {
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        var key = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()["mapKey"];
+        var key = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()["MapKey"];
 
         var homeViewModel = new HomeViewModel(key);
         var homeView = new HomeView();

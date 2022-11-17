@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BakuBus_WPF.Views" xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+        xmlns:local="clr-namespace:BakuBus_WPF.Views" xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF" xmlns:mycontrols="clr-namespace:BakuBus_WPF.CustomControls"
         mc:Ignorable="d"
         Title="HomeView" Height="450" Width="800">
-    <Grid>
+    <Grid x:Name="grid">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -21,7 +21,7 @@
             </ControlTemplate>
         </Grid.Resources>
 
-        <m:Map x:Name="myMap" Mode="AerialWithLabels" CredentialsProvider="{Binding MapKey}"  Center="40.409264 ,49.867092 " ZoomLevel="11" Grid.ColumnSpan="2">
+        <m:Map Grid.Column="1" x:Name="myMap" Mode="AerialWithLabels" CredentialsProvider="{Binding MapKey}"  Center="40.409264 ,49.867092 " ZoomLevel="11" Grid.ColumnSpan="2">
             <m:MapItemsControl Name="mapList" ItemsSource="{Binding BakuBus.Buses}">
                 <m:MapItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -44,25 +44,31 @@
                                     <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="14" Text="{Binding Attributes.BUS_ID}"/>
 
 
-                                    <Image Grid.Row="1" Grid.ColumnSpan="2" Source="/Bus.png"></Image>
-
+                                    <Image Grid.Row="1" Grid.ColumnSpan="2"  Source="\StaticFiles\Images\BusPhoto.jpg"></Image>
+                                    <Line Stroke="Red" StrokeThickness="5"></Line>
                                     <TextBlock Grid.Row="2" HorizontalAlignment="Center" Margin="0 0 3 0" FontSize="14" Text="Previous: "/>
                                     <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Margin="3 0 0 0" FontSize="14" Text="{Binding Attributes.PREV_STOP}"/>
                                     <TextBlock Grid.Row="3" HorizontalAlignment="Center" FontSize="14" Text="Current: "/>
                                     <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" FontSize="14" Text="{Binding Attributes.CURRENT_STOP}"/>
                                 </Grid>
-
-
-
                             </m:Pushpin.ToolTip>
                         </m:Pushpin>
                     </DataTemplate>
                 </m:MapItemsControl.ItemTemplate>
             </m:MapItemsControl>
         </m:Map>
-        <ComboBox ItemsSource="{Binding ComboBoxBuses}" SelectedItem="{Binding MySelectedItem}"  VerticalAlignment="Top" Margin=" 5 20 5 10"/>
-        <!--<mycontrols:MyComboBox Command="{Binding BusSelectCommand}" CommandParameter="{Binding ElementName=mapList}" CommandTarget="{Binding ElementName=mapList}" SelectedIndex="{Binding CurrentIndex,UpdateSourceTrigger=PropertyChanged}"  
-                               VerticalAlignment="Top" Margin=" 5 20 5 10" ItemsSource="{Binding ComboBoxBuses}"/>-->
+        <StackPanel Background="Red" Orientation="Vertical">
+            <Border Background="White">
+                <Image Source="\StaticFiles\Images\logo.png"></Image>
+            </Border>
 
+            <mycontrols:ComboBoxWithCommand  Margin="0 20 0 0" Height="30"
+            Command="{Binding BusSelectCommand}" 
+            CommandParameter="{Binding ElementName=mapList}"
+            SelectedIndex="{Binding CurrentIndex,UpdateSourceTrigger=PropertyChanged}" 
+            ItemsSource="{Binding ComboBoxBuses}"
+            />
+
+        </StackPanel>
     </Grid>
 </Window>

@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace BakuBus_WPF.Views
 {
-    /// <summary>
-    /// HomeView.xaml etkileşim mantığı
-    /// </summary>
     public partial class HomeView : Window
     {
         public HomeView()

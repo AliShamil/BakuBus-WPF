@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -20,35 +20,41 @@ namespace BakuBus_WPF.ViewModels;
 internal class HomeViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    private void NotifyPropertyChanged(string prorertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prorertyName));
+    private void OnPropertyChanged(string prorertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prorertyName));
 
-    public ObservableCollection<string> ComboBoxBuses { get; set; }
-    
-    private string _mySelectedItem;
-    public string MySelectedItem
-    {
-        get { return _mySelectedItem; }
-        set
-        {
-            MessageBox.Show(value);
 
-            _mySelectedItem = value;
-        }
-    }
-    //private List<string> comboBoxBuses;
+    // Selected Changed ucun bir usul tapdim ancaq mapItemsource daki pushpinleri deyishe bilmedim ona gore bu metodu ishlede bilmedim
 
-    //public List<string> ComboBoxBuses
+    //public ObservableCollection<string> ComboBoxBuses { get; set; }
+
+    //private string _mySelectedItem;
+    //public string MySelectedItem
     //{
-    //    get { return comboBoxBuses; }
+    //    get { return _mySelectedItem; }
     //    set
     //    {
-    //        comboBoxBuses = value;
-    //        NotifyPropertyChanged(nameof(ComboBoxBuses));
+    //        MessageBox.Show(value);
+
+    //        _mySelectedItem = value;
     //    }
     //}
 
+    private List<string> comboBoxBuses;
+
+    public List<string> ComboBoxBuses
+    {
+        get { return comboBoxBuses; }
+        set
+        {
+            comboBoxBuses = value;
+            OnPropertyChanged(nameof(ComboBoxBuses));
+        }
+    }
+
     public ICommand BusSelectCommand { get; set; }
+
     public int CurrentIndex { get; set; }
+
     private BakuBus? bakuBus;
 
     public BakuBus? BakuBus
@@ -57,11 +63,11 @@ internal class HomeViewModel : INotifyPropertyChanged
         set
         {
             bakuBus = value;
-            NotifyPropertyChanged(nameof(BakuBus));
+            OnPropertyChanged(nameof(BakuBus));
         }
     }
-    private ApplicationIdCredentialsProvider? mapKey;
 
+    private ApplicationIdCredentialsProvider? mapKey;
 
     public ApplicationIdCredentialsProvider? MapKey
     {
@@ -69,7 +75,7 @@ internal class HomeViewModel : INotifyPropertyChanged
         set
         {
             mapKey = value;
-            NotifyPropertyChanged(nameof(MapKey));
+            OnPropertyChanged(nameof(MapKey));
         }
     }
 
@@ -78,10 +84,10 @@ internal class HomeViewModel : INotifyPropertyChanged
     {
         MapKey = new ApplicationIdCredentialsProvider(key);
 
-        ComboBoxBuses = new();
+        comboBoxBuses = new();
         ComboBoxBuses.Add("View All");
 
-        UpdateBakuBusStatus();
+        UpdateLocations();
 
 
         DispatcherTimer timer = new();
@@ -92,37 +98,42 @@ internal class HomeViewModel : INotifyPropertyChanged
         BusSelectCommand = new RelayCommand(ExecuteBusSelectCommand);
     }
 
-
     private void ExecuteBusSelectCommand(object? parametr)
     {
         if (parametr is MapItemsControl map)
         {
             var busName = ComboBoxBuses[CurrentIndex];
 
+            if (busName == "Show All")
+                foreach (var bus in map.Items.OfType<Bus>())
+                    bus.Attributes.VISIBILITY = Visibility.Visible;
+
             foreach (var bus in map.Items.OfType<Bus>())
             {
 
                 if (bus.Attributes.DISPLAY_ROUTE_CODE != busName)
+                {
                     bus.Attributes.VISIBILITY = Visibility.Collapsed;
+                }
+
                 else
                     bus.Attributes.VISIBILITY = Visibility.Visible;
             }
 
         }
+
     }
 
-    private void Timer_Tick(object? sender, EventArgs e)
-    {
-        UpdateBakuBusStatus();
-    }
+    private void Timer_Tick(object? sender, EventArgs e) => UpdateLocations();
 
-    private async void UpdateBakuBusStatus()
+    private async void UpdateLocations()
     {
         try
         {
             var client = new HttpClient();
             var jsonStr = await client.GetStringAsync("https://www.bakubus.az/az/ajax/apiNew1");
             BakuBus = JsonSerializer.Deserialize<BakuBus>(jsonStr);
+            BakuBus = JsonSerializer.Deserialize<BakuBus>(File.ReadAllText("../../../bakubusApi.json"));
         }
         catch (Exception)
         {
@@ -149,4 +160,5 @@ internal class HomeViewModel : INotifyPropertyChanged
         }
 
     }
+
 }
